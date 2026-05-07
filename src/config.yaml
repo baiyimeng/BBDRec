@@ -1,0 +1,75 @@
+# ============================================================
+# Dataset & Device
+# ============================================================
+dataset: ml-100k  # Dataset name: toys, beauty, ml-100k, yelp, sports, baby
+device: cuda:0  # Device: cpu, cuda:0, cuda:1
+random_seed: 100  # Random seed for reproducibility
+
+# ============================================================
+# Training Configuration
+# ============================================================
+batch_size: 512  # Batch size
+epochs: 500  # Number of training epochs
+lr: 0.001  # Learning rate
+weight_decay: 0.00001  # L2 regularization
+
+# Early stopping
+patience: 4  # Epochs to wait before early stopping
+eval_interval: 5  # Evaluation interval in epochs
+
+# ============================================================
+# Model Architecture (Common)
+# ============================================================
+max_len: 50  # Maximum sequence length
+hidden_size: 128  # Hidden size
+dropout: 0.1  # Dropout rate for hidden layers
+emb_dropout: 0.3  # Dropout rate for embedding
+is_causal: true  # Use causal attention mask
+
+# ============================================================
+# Diffusion Model (Common)
+# ============================================================
+diffusion_steps: 32  # Number of diffusion steps
+noise_schedule: trunc_lin  # Noise schedule: linear, quadratic, trunc_lin, etc.
+beta_a: 0.3  # Beta schedule parameter a
+beta_b: 10  # Beta schedule parameter b
+schedule_sampler_name: uniform  # Timestep sampler: uniform, lossaware
+rescale_timesteps: true  # Rescale timesteps to [0, 1000]
+
+# ============================================================
+# Method-Specific Configuration
+# ============================================================
+
+lambda_uncertainty: 0.001  # Uncertainty weight for AdRec
+independent: true  # Independent diffusion (AdRec only)
+geodesic: false  # Geodesic diffusion in hyperbolic space (AdRec only)
+diff_decoder: att  # Decoder type: att (Transformer) or mlp
+var_max: 1.0  # Maximum variance for BBDRec diffusion
+
+# Classifier-free Guidance
+cfg_scale: 1.0  # CFG scale (1.0 means no guidance)
+
+# Loss configuration
+loss_scale: 1.0  # Scaling factor for diffusion loss
+
+# Training strategy
+split_onebyone: false  # Split sequences one-by-one for training
+parallel_ag: true  # Parallel autoregressive training
+pretrained: false  # Use pretrained item embeddings
+freeze_emb: false  # Freeze item embedding during training
+pcgrad: false  # Use PCGrad for multi-task optimization
+
+# ============================================================
+# Logging & Experiment
+# ============================================================
+model: bbdrec  # Model name: bbdrec, adrec, diffurec, dreamrec, sasrec, pretrain
+log_file: logs/  # Log directory
+description: _  # Experiment description for log file naming
+
+# ============================================================
+# Evaluation
+# ============================================================
+metric_ks:  # Metrics@K
+  - 5
+  - 10
+  - 20
