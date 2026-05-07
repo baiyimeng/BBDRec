@@ -3,7 +3,7 @@
 
 This is the PyTorch implementation of the paper:
 
-> [**Unconditional Diffusion for Generative Sequential Recommendation**](https://arxiv.org/abs/2507.06121)
+> [**Brownian Bridge Diffusion for Sequential Recommendation**](https://arxiv.org/abs/2507.06121)
 >
 > Yimeng Bai, Yang Zhang, Sihao Ding, Shaohui Ruan, Han Yao, Danhui Guan, Fuli Feng, Tat-Seng Chua.
 
