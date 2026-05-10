@@ -9,6 +9,7 @@ datasets = ["Baby", "Beauty", "ML-100K", "Sports", "Toys", "Yelp"]
 
 variants = [
     "w/o pretrain",
+    "w/ frozen emb",
     "w/o warmup",
     "w/o MSE",
     "w/o CE",
@@ -20,6 +21,7 @@ data = {
         "HR": {
             "Base": 7.4841,
             "w/o pretrain": 4.3702,
+            "w/ frozen emb": 4.8341,
             "w/o warmup": 6.2919,
             "w/o MSE": 7.1084,
             "w/o CE": 2.8705,
@@ -28,6 +30,7 @@ data = {
         "NDCG": {
             "Base": 3.2566,
             "w/o pretrain": 2.1321,
+            "w/ frozen emb": 1.8216,
             "w/o warmup": 2.8630,
             "w/o MSE": 3.1616,
             "w/o CE": 1.0633,
@@ -38,6 +41,7 @@ data = {
         "HR": {
             "Base": 17.1476,
             "w/o pretrain": 12.7030,
+            "w/ frozen emb": 8.8858,
             "w/o warmup": 15.7745,
             "w/o MSE": 15.9344,
             "w/o CE": 2.6786,
@@ -46,6 +50,7 @@ data = {
         "NDCG": {
             "Base": 8.2508,
             "w/o pretrain": 6.8289,
+            "w/ frozen emb": 3.3175,
             "w/o warmup": 7.8375,
             "w/o MSE": 7.9077,
             "w/o CE": 0.9803,
@@ -56,6 +61,7 @@ data = {
         "HR": {
             "Base": 22.9676,
             "w/o pretrain": 15.2472,
+            "w/ frozen emb": 17.9243,
             "w/o warmup": 19.9760,
             "w/o MSE": 19.1938,
             "w/o CE": 13.7026,
@@ -64,6 +70,7 @@ data = {
         "NDCG": {
             "Base": 8.4818,
             "w/o pretrain": 5.8156,
+            "w/ frozen emb": 7.0224,
             "w/o warmup": 7.3398,
             "w/o MSE": 7.5283,
             "w/o CE": 4.7744,
@@ -74,6 +81,7 @@ data = {
         "HR": {
             "Base": 7.9144,
             "w/o pretrain": 5.8016,
+            "w/ frozen emb": 3.2162,
             "w/o warmup": 7.7197,
             "w/o MSE": 7.6156,
             "w/o CE": 2.1929,
@@ -82,6 +90,7 @@ data = {
         "NDCG": {
             "Base": 3.3872,
             "w/o pretrain": 3.0323,
+            "w/ frozen emb": 1.2785,
             "w/o warmup": 3.5651,
             "w/o MSE": 3.3346,
             "w/o CE": 0.9263,
@@ -92,6 +101,7 @@ data = {
         "HR": {
             "Base": 12.1284,
             "w/o pretrain": 9.6977,
+            "w/ frozen emb": 4.2035,
             "w/o warmup": 11.5065,
             "w/o MSE": 10.8781,
             "w/o CE": 1.6644,
@@ -100,6 +110,7 @@ data = {
         "NDCG": {
             "Base": 5.8464,
             "w/o pretrain": 5.7430,
+            "w/ frozen emb": 1.6228,
             "w/o warmup": 5.8305,
             "w/o MSE": 5.6743,
             "w/o CE": 0.6142,
@@ -110,6 +121,7 @@ data = {
         "HR": {
             "Base": 7.5349,
             "w/o pretrain": 6.4189,
+            "w/ frozen emb": 0.2334,
             "w/o warmup": 7.0716,
             "w/o MSE": 6.9188,
             "w/o CE": 1.8390,
@@ -118,6 +130,7 @@ data = {
         "NDCG": {
             "Base": 3.0242,
             "w/o pretrain": 2.5302,
+            "w/ frozen emb": 0.0765,
             "w/o warmup": 2.8079,
             "w/o MSE": 2.7752,
             "w/o CE": 0.7424,
@@ -125,7 +138,6 @@ data = {
         },
     },
 }
-
 
 # =========================
 # 2. Helper
@@ -152,7 +164,7 @@ plt.rcParams.update(
         "axes.titlesize": 7,
         "xtick.labelsize": 6,
         "ytick.labelsize": 6,
-        "legend.fontsize": 5.8,
+        "legend.fontsize": 5.5,
         "axes.linewidth": 0.55,
         "xtick.major.width": 0.55,
         "ytick.major.width": 0.55,
@@ -163,15 +175,15 @@ plt.rcParams.update(
     }
 )
 
-
 # =========================
 # 4. Plot
 # =========================
 
-fig, axes = plt.subplots(2, 6, figsize=(3.55, 1.85), sharey="row")
+fig, axes = plt.subplots(2, 6, figsize=(3.9, 1.85), sharey="row")
 
 colors = [
     "#4C78A8",  # w/o pretrain
+    "#B279A2",  # w/ frozen emb
     "#F58518",  # w/o warmup
     "#54A24B",  # w/o MSE
     "#E45756",  # w/o CE
@@ -192,8 +204,6 @@ for col, dataset in enumerate(datasets):
         hr_delta,
         color=colors,
         width=0.72,
-        edgecolor="black",
-        linewidth=0.25,
     )
 
     ax_ndcg.bar(
@@ -201,8 +211,6 @@ for col, dataset in enumerate(datasets):
         ndcg_delta,
         color=colors,
         width=0.72,
-        edgecolor="black",
-        linewidth=0.25,
     )
 
     for ax in [ax_hr, ax_ndcg]:
@@ -222,13 +230,13 @@ axes[0, 0].set_ylabel(r"$\Delta$HR (%)", labelpad=1)
 axes[1, 0].set_ylabel(r"$\Delta$NDCG (%)", labelpad=1)
 
 # y-axis ranges
-axes[0, 0].set_ylim(-90, 15)
-axes[1, 0].set_ylim(-95, 15)
+axes[0, 0].set_ylim(-100, 15)
+axes[1, 0].set_ylim(-100, 15)
 
 for ax in axes[0, :]:
-    ax.set_yticks([-80, -40, 0])
+    ax.set_yticks([-100, -80, -40, 0])
 for ax in axes[1, :]:
-    ax.set_yticks([-80, -40, 0])
+    ax.set_yticks([-100, -80, -40, 0])
 
 # =========================
 # 5. Shared legend in one row
@@ -236,27 +244,25 @@ for ax in axes[1, :]:
 
 legend_labels = [
     "w/o pretrain",
+    "w/ frozen emb",
     "w/o warmup",
     "w/o MSE",
     "w/o CE",
-    "MLP denoiser",
+    "w/ MLP denoiser",
 ]
 
-handles = [
-    plt.Rectangle((0, 0), 1, 1, color=colors[i], ec="black", lw=0.25)
-    for i in range(len(colors))
-]
+handles = [plt.Rectangle((0, 0), 1, 1, color=colors[i]) for i in range(len(colors))]
 
 fig.legend(
     handles,
     legend_labels,
     loc="upper center",
-    ncol=5,
+    ncol=6,
     frameon=False,
     bbox_to_anchor=(0.5, 1.12),
-    columnspacing=0.45,
-    handlelength=0.75,
-    handletextpad=0.25,
+    columnspacing=0.35,
+    handlelength=0.65,
+    handletextpad=0.2,
 )
 
 fig.tight_layout(
