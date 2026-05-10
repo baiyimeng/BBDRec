@@ -41,8 +41,9 @@ def choose_model(args):
         "bbdrec",
         "bbdrec-0",
         "bbdrec-1",
+        "sdifrec",
     ]:
-        if args.model == "bbdrec":
+        if args.model in ["bbdrec"]:
             args.pretrained = True
             args.freeze_emb = True
         if args.model in ["bbdrec-1"]:
@@ -104,7 +105,7 @@ def model_train(
     best_model = None
     for epoch_temp in range(epochs):
         model_joint.train()
-        if epoch_temp == 5 and args.model == "bbdrec":
+        if epoch_temp == 5 and args.model in ["bbdrec"]:
             print("=" * 60)
             print(
                 f"[Warm-up] Finished at epoch {epoch_temp}, unfreezing item embedding"

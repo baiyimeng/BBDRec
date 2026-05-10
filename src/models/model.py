@@ -7,6 +7,7 @@ import torch.nn.functional as F
 from models.bbdrec import BBDRec
 from models.diffurec import DiffuRec
 from models.dreamrec import DreamRec
+from models.sdifrec import SdifRec
 
 
 class DiffusionRecommender(nn.Module):
@@ -84,6 +85,8 @@ def create_model_diffu(args):
         return DiffuRec(args)
     elif args.model == "dreamrec":
         return DreamRec(args)
+    elif args.model == "sdifrec":
+        return SdifRec(args)
     elif args.model in ["bbdrec", "bbdrec-0", "bbdrec-1"]:
         return BBDRec(args)
     else:
