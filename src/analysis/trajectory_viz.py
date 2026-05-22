@@ -99,7 +99,6 @@ def build_args(dataset: str, model_name: str) -> argparse.Namespace:
         if model_name == "diffurec":
             config["is_causal"] = False
     config["geodesic"] = False
-    config["pcgrad"] = False
 
     return argparse.Namespace(**config)
 

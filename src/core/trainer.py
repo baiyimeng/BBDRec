@@ -9,9 +9,15 @@ from torch import optim
 from tqdm import tqdm
 
 from core.metrics import hrs_and_ndcgs_k
-from core.pcgrad import PCGrad
+from models.bert4rec import BERT4Rec
+from models.core import CORE
+from models.eulerformer import EulerFormer
+from models.fearec import FEARec
+from models.gru4rec import GRU4Rec
+from models.lightsans import LightSANs
 from models.model import DiffusionRecommender
 from models.sasrec import SASRec
+from models.svae import SVAE
 from utils.data import Data_Test, Data_Train, Data_Val
 
 
@@ -59,6 +65,44 @@ def choose_model(args):
         model = DiffusionRecommender(args)
     elif args.model in ["sasrec", "pretrain"]:
         model = SASRec(args)
+    elif args.model == "gru4rec":
+        model = GRU4Rec(args)
+    elif args.model == "bert4rec":
+        # BERT4Rec is bidirectional and uses a [MASK] token at the end of the
+        # input to predict the next item; it does not produce a parallel target
+        # at every position.
+        args.parallel_ag = False
+        args.split_onebyone = True
+        args.is_causal = False
+        model = BERT4Rec(args)
+    elif args.model == "core":
+        # CORE encodes a sequence into a single normalised vector; the loss
+        # only applies at the last position.
+        args.parallel_ag = False
+        args.split_onebyone = True
+        model = CORE(args)
+    elif args.model == "lightsans":
+        # LightSANs pools into a single representation via its low-rank
+        # attention; train with single-target sequences.
+        args.parallel_ag = False
+        args.split_onebyone = True
+        model = LightSANs(args)
+    elif args.model == "fearec":
+        # FEARec uses a causal hybrid attention (time + frequency); the SSL
+        # auxiliary losses from the original paper are dropped here.
+        args.is_causal = True
+        model = FEARec(args)
+    elif args.model == "svae":
+        # SVAE produces a per-position latent + decoded hidden; train with the
+        # parallel-AG paradigm so every step contributes a target.
+        args.parallel_ag = True
+        args.split_onebyone = False
+        model = SVAE(args)
+    elif args.model == "eulerformer":
+        # EulerFormer is autoregressive (SASRec-style) with a learnable Euler
+        # rotary embedding and an angle-consistency aux loss.
+        args.is_causal = True
+        model = EulerFormer(args)
     else:
         raise NotImplementedError("Model not implemented.")
 
@@ -92,8 +136,8 @@ def model_train(
     device = args.device
     metric_ks = args.metric_ks
     torch.set_float32_matmul_precision("high")
-    optimizer = PCGrad(optimizers(model_joint, args), args.pcgrad)
-    lr_scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer.optim, T_max=500)
+    optimizer = optimizers(model_joint, args)
+    lr_scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=500)
     best_metrics_dict = {}
     best_epoch = {}
     for k in args.metric_ks:
@@ -137,10 +181,18 @@ def model_train(
                 losses = [ce_loss, args.loss_scale * diff_loss]
             elif args.model == "dreamrec":
                 losses = [diff_loss]
+            elif args.model == "svae":
+                # SVAE: CE on the decoded representation + (annealed) KL term.
+                losses = [ce_loss, getattr(args, "svae_anneal", 0.2) * diff_loss]
+            elif args.model == "eulerformer":
+                # EulerFormer: CE + angle-consistency loss (already scaled by
+                # ``euler_lamb`` inside the model).
+                losses = [ce_loss, diff_loss]
             else:
                 losses = [ce_loss]
 
-            optimizer.pc_backward(losses)
+            total_loss = sum(losses)
+            total_loss.backward()
             ce_losses.append(ce_loss.item())
             diff_losses.append(diff_loss.item())
             optimizer.step()

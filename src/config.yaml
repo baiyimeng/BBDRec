@@ -40,9 +40,9 @@ rescale_timesteps: true  # Rescale timesteps to [0, 1000]
 # Method-Specific Configuration
 # ============================================================
 
-lambda_uncertainty: 0.001  # Uncertainty weight for AdRec
-independent: true  # Independent diffusion (AdRec only)
-geodesic: false  # Geodesic diffusion in hyperbolic space (AdRec only)
+lambda_uncertainty: 0.001  # Uncertainty weight for diffusion-based models
+independent: true  # Independent diffusion per-token
+geodesic: false  # Geodesic diffusion in hyperbolic space
 diff_decoder: att  # Decoder type: att (Transformer) or mlp
 var_max: 1.0  # Maximum variance for BBDRec diffusion
 
@@ -57,12 +57,10 @@ split_onebyone: false  # Split sequences one-by-one for training
 parallel_ag: true  # Parallel autoregressive training
 pretrained: false  # Use pretrained item embeddings
 freeze_emb: false  # Freeze item embedding during training
-pcgrad: false  # Use PCGrad for multi-task optimization
-
 # ============================================================
 # Logging & Experiment
 # ============================================================
-model: bbdrec  # Model name: bbdrec, adrec, diffurec, dreamrec, sasrec, pretrain
+model: bbdrec  # Model name: bbdrec, diffurec, dreamrec, sasrec, pretrain
 log_file: logs/  # Log directory
 description: _  # Experiment description for log file naming
 

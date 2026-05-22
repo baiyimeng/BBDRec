@@ -90,7 +90,6 @@ def cmdline_args():
     parser.add_argument("--parallel_ag", type=str2bool, help="Parallel autoregressive")
     parser.add_argument("--pretrained", type=str2bool, help="Use pretrained embedding")
     parser.add_argument("--freeze_emb", type=str2bool, help="Freeze embedding")
-    parser.add_argument("--pcgrad", type=str2bool, help="Use PCGrad")
 
     # ============================================================
     # Logging & Evaluation

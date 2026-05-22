@@ -9,7 +9,6 @@
 #   no_warmup   - bbdrec-1 (pretrain but no warmup freeze)
 #   no_mse      - bbdrec with loss_scale=0 (remove diffusion loss)
 #   mlp_decoder - bbdrec with diff_decoder=mlp
-#   pcgrad      - bbdrec with PCGrad multi-task optimization
 # ====================================================
 
 NUM_GPUS=2
