@@ -70,7 +70,7 @@ BBDRec/
     ├── figure/              # Paper figures (PDF + reproducible Python scripts)
     ├── saved/pretrain/<dataset>/pretrain.pth # SASRec-pretrained item embeddings
     ├── reproduce_bbdrec.sh  # One-click BBDRec reproduction
-    ├── run_baselines.sh     # Train baseline diffusion models
+    ├── run_baselines.sh     # Batch-train all baselines (11 models × 6 datasets)
     ├── tune_bbdrec_ds_vm_ls.sh  # Hyperparameter grid search
     └── ablation_bbdrec.sh   # Ablation experiments
 ```
@@ -191,6 +191,8 @@ Run any variant with `python main.py --model <variant> --dataset <name>`.
 
 All baselines are ported into BBDRec's unified `(item_seq, tgt_seq)` interface. Adaptation notes (e.g. how a bidirectional model is wired into left-padded sequences) live in `core/trainer.py::choose_model`. We list the original paper and the codebase used as a reference for each port.
 
+> **Hyperparameter settings.** Unless stated otherwise, every baseline reuses the *same* shared protocol as BBDRec — `max_len=50`, `hidden_size=128`, `dropout=0.5`, `lr=1e-3`, `batch_size=512`, Adam optimizer, HR/NDCG@{5,10,20}, early stopping `patience=4` with `eval_interval=5` — following **DiffuRec** (Li *et al.*, TOIS 2023, [arXiv:2304.00686](https://arxiv.org/abs/2304.00686)). The only model-specific knobs we keep from the original baseline papers are the architectural ones (e.g. BERT4Rec mask ratio, FEARec frequency-domain ratio, EulerFormer rotary-emb dim, SVAE KL annealing), to keep the comparison strictly fair on the *training* side.
+
 ### Diffusion-based
 
 | Key | Method | Reference | Run command |
@@ -219,23 +221,28 @@ All baselines are ported into BBDRec's unified `(item_seq, tgt_seq)` interface. 
 
 ### Batch training of all baselines
 
-`run_baselines.sh` currently distributes `diffurec` / `dreamrec` across multiple GPUs. To extend it to additional baselines, edit the `MODELS=(...)` array near the top:
+`src/run_baselines.sh` is a one-click launcher that trains **every** baseline above on **every** dataset, distributed across multiple GPUs. The model list and dataset list are declared at the top of the script:
 
 ```bash
 # src/run_baselines.sh
 MODELS=("sasrec" "gru4rec" "bert4rec" "lightsans" "core" "fearec" \
         "eulerformer" "svae" "diffurec" "dreamrec" "sdifrec")
 DATASETS=("baby" "beauty" "ml-100k" "sports" "toys" "yelp")
+NUM_GPUS=4           # number of GPUs to use
+TASKS_PER_GPU=3      # concurrent jobs per GPU
+GPU_START=0          # starting cuda index (cuda:0, cuda:1, ...)
 ```
 
-Then run:
+Run it with:
 
 ```bash
 cd src
 bash run_baselines.sh
 ```
 
-Results are aggregated automatically at the end of the script into `logs/baselines/results.txt` (test HR@20 / NDCG@20 per model–dataset pair).
+The launcher round-robins the 11 × 6 = 66 (model, dataset) jobs over `NUM_GPUS × TASKS_PER_GPU` workers, writes per-job logs to `logs/baselines/<model>_<dataset>.log`, and aggregates test HR@{5,10,20} / NDCG@{5,10,20} into a single table at the end of `logs/baselines/run_baselines.log` once all jobs finish.
+
+All baselines inherit the shared training protocol from `config.yaml` (the DiffuRec setting; see the callout above), so the only thing you need to change to run an additional baseline is to append its key to `MODELS=(...)`.
 
 ---
 

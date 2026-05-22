@@ -1,7 +1,12 @@
 #!/bin/bash
 
 # ==================== CONFIGURATION ====================
-MODELS=("diffurec" "dreamrec")
+# Batch training of all baselines.
+# Hyperparameter settings (max_len=50, hidden_size=128, dropout=0.5, lr=1e-3,
+# batch_size=512, embed init, etc.) follow the DiffuRec paper
+# (Li et al., TOIS 2023, https://arxiv.org/abs/2304.00686) for fair comparison.
+MODELS=("sasrec" "gru4rec" "bert4rec" "lightsans" "core" "fearec" \
+        "eulerformer" "svae" "diffurec" "dreamrec" "sdifrec")
 DATASETS=("baby" "beauty" "ml-100k" "sports" "toys" "yelp")
 
 NUM_GPUS=4             # 使用的 GPU 数量
