@@ -184,15 +184,15 @@ plt.rcParams.update(
         "font.serif": ["Times New Roman", "Times", "DejaVu Serif"],
         "font.size": 7,
         "axes.labelsize": 7,
-        "axes.titlesize": 8,
+        "axes.titlesize": 7,
         "xtick.labelsize": 6,
         "ytick.labelsize": 6,
-        "legend.fontsize": 6,
+        "legend.fontsize": 5.8,
         "axes.linewidth": 0.55,
         "xtick.major.width": 0.55,
         "ytick.major.width": 0.55,
-        "xtick.major.size": 2.5,
-        "ytick.major.size": 2.5,
+        "xtick.major.size": 2.3,
+        "ytick.major.size": 2.3,
         "pdf.fonttype": 42,
         "ps.fonttype": 42,
     }
@@ -219,13 +219,14 @@ markers = {
     "Yelp": "P",
 }
 
+# NPG palette for the six datasets, kept fully consistent with 7_plus / 8_emb_metrics.
 colors = {
-    "Baby": "#1f77b4",
-    "Beauty": "#ff7f0e",
-    "ML-100K": "#2ca02c",
-    "Sports": "#d62728",
-    "Toys": "#9467bd",
-    "Yelp": "#8c564b",
+    "Baby":    "#3C5488",  # NPG deep blue
+    "Beauty":  "#E64B35",  # NPG red
+    "ML-100K": "#00A087",  # NPG teal
+    "Sports":  "#F39B7F",  # NPG salmon
+    "Toys":    "#4DBBD5",  # NPG sky blue
+    "Yelp":    "#8491B4",  # NPG slate
 }
 
 # 2 rows x 4 columns, still ACM single-column style
@@ -308,4 +309,4 @@ fig.tight_layout(
 )
 
 plt.savefig("4_hyper.pdf", bbox_inches="tight")
-plt.show()
+print("Saved: 4_hyper.pdf")

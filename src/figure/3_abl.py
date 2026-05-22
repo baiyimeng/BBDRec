@@ -164,7 +164,7 @@ plt.rcParams.update(
         "axes.titlesize": 7,
         "xtick.labelsize": 6,
         "ytick.labelsize": 6,
-        "legend.fontsize": 5.5,
+        "legend.fontsize": 5.8,
         "axes.linewidth": 0.55,
         "xtick.major.width": 0.55,
         "ytick.major.width": 0.55,
@@ -181,13 +181,15 @@ plt.rcParams.update(
 
 fig, axes = plt.subplots(2, 6, figsize=(3.9, 1.85), sharey="row")
 
+# NPG palette: keep the most informative variant (w/o CE, the most damaging
+# one) in the signature NPG red so the eye is naturally drawn to it.
 colors = [
-    "#4C78A8",  # w/o pretrain
-    "#B279A2",  # w/ frozen emb
-    "#F58518",  # w/o warmup
-    "#54A24B",  # w/o MSE
-    "#E45756",  # w/o CE
-    "#72B7B2",  # w/ MLP denoiser
+    "#3C5488",  # w/o pretrain    – NPG deep blue
+    "#4DBBD5",  # w/ frozen emb   – NPG sky blue
+    "#F39B7F",  # w/o warmup      – NPG salmon
+    "#00A087",  # w/o MSE         – NPG teal
+    "#E64B35",  # w/o CE          – NPG red       (most critical ablation)
+    "#8491B4",  # w/ MLP denoiser – NPG slate
 ]
 
 x = np.arange(len(variants))
@@ -272,4 +274,4 @@ fig.tight_layout(
 )
 
 plt.savefig("3_abl.pdf", bbox_inches="tight")
-plt.show()
+print("Saved: 3_abl.pdf")

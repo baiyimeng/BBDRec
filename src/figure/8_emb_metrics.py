@@ -63,13 +63,13 @@ plt.rcParams.update(
         "axes.labelsize": 7,
         "axes.titlesize": 7,
         "xtick.labelsize": 6,
-        "ytick.labelsize": 5.5,
-        "legend.fontsize": 5.5,
+        "ytick.labelsize": 6,
+        "legend.fontsize": 5.8,
         "axes.linewidth": 0.55,
         "xtick.major.width": 0.55,
         "ytick.major.width": 0.55,
-        "xtick.major.size": 2.0,
-        "ytick.major.size": 2.0,
+        "xtick.major.size": 2.3,
+        "ytick.major.size": 2.3,
         "pdf.fonttype": 42,
         "ps.fonttype": 42,
     }
@@ -82,10 +82,10 @@ plt.rcParams.update(
 fig, axes = plt.subplots(4, 1, figsize=(3.45, 3.55))
 
 colors = [
-    "#4C78A8",  # SASRec – blue
-    "#E45756",  # BBDRec – red (our method)
-    "#54A24B",  # DreamRec – green
-    "#F58518",  # DiffuRec – orange
+    "#8491B4",  # SASRec   – NPG slate     (non-diffusion baseline)
+    "#E64B35",  # BBDRec   – NPG red       (ours, matches 7_plus)
+    "#00A087",  # DreamRec – NPG teal      (matches DreamRec family in 7_plus)
+    "#4DBBD5",  # DiffuRec – NPG sky blue  (matches DiffuRec family in 7_plus)
 ]
 
 row_keys   = ["sv_mean", "sv_var", "isotropy", "kl"]
@@ -163,7 +163,7 @@ fig.legend(
     loc="upper center",
     ncol=4,
     frameon=False,
-    bbox_to_anchor=(0.5, 0.9),
+    bbox_to_anchor=(0.5, 0.96),
     columnspacing=0.55,
     handlelength=0.75,
     handletextpad=0.25,

@@ -144,16 +144,17 @@ plt.rcParams.update(
 
 fig, axes = plt.subplots(2, 6, figsize=(3.8, 1.95), sharey="row")
 
-# Same-color families:
-# DreamRec / DreamRec+: light blue / dark blue
-# DiffuRec / DiffuRec+: light orange / dark orange
-# BBDRec: red
+# Nature / NPG palette.
+# Paired methods share a hue family with light/dark variants:
+#   DreamRec  / DreamRec+ : light teal  / NPG teal
+#   DiffuRec  / DiffuRec+ : NPG sky blue / NPG deep blue
+# BBDRec uses the NPG signature red as the hero color for "ours".
 colors = [
-    "#FCAEAE",  # DreamRec, medium light red
-    "#FF4D4D",  # DreamRec+, strong red
-    "#6A9CF7",  # DiffuRec, medium blue
-    "#536DFE",  # DiffuRec+, deep blue
-    "#6A3D9A",  # BBDRec, deep purple
+    "#91D1C2",  # DreamRec   – light teal
+    "#00A087",  # DreamRec+  – NPG teal
+    "#4DBBD5",  # DiffuRec   – NPG sky blue
+    "#3C5488",  # DiffuRec+  – NPG deep blue
+    "#E64B35",  # BBDRec     – NPG red (ours)
 ]
 
 
@@ -226,4 +227,4 @@ fig.tight_layout(
 )
 
 plt.savefig("7_plus.pdf", bbox_inches="tight")
-plt.show()
+print("Saved: 7_plus.pdf")
