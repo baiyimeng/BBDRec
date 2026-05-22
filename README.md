@@ -208,7 +208,7 @@ All baselines are ported into BBDRec's unified `(item_seq, tgt_seq)` interface. 
 | `lightsans` | **LightSANs**: Lighter and Better — Low-Rank Decomposed Self-Attention Networks for Next-Item Recommendation (Fan *et al.*, SIGIR 2021) | [paper](https://dl.acm.org/doi/10.1145/3404835.3463068) · port adapted from [RecBole](https://github.com/RUCAIBox/RecBole/blob/master/recbole/model/sequential_recommender/lightsans.py) | `python main.py --model lightsans --dataset <name>` |
 | `core` | **CORE**: Simple and Effective Session-based Recommendation within Consistent Representation Space (Hou *et al.*, SIGIR 2022) | [paper](https://arxiv.org/abs/2204.11067) · port adapted from [RecBole](https://github.com/RUCAIBox/RecBole/blob/master/recbole/model/sequential_recommender/core.py) | `python main.py --model core --dataset <name>` |
 | `fearec` | **FEARec**: Frequency Enhanced Hybrid Attention Network for Sequential Recommendation (Du *et al.*, SIGIR 2023) | [paper](https://arxiv.org/abs/2305.09542) · port adapted from [RecBole](https://github.com/RUCAIBox/RecBole/blob/master/recbole/model/sequential_recommender/fearec.py) (SSL/contrastive losses are dropped because they require dataset-level `same_item_index` metadata not present in BBDRec) | `python main.py --model fearec --dataset <name>` |
-| `eulerformer` | **EulerFormer**: SASRec backbone with an Euler-form learnable rotary embedding and an angle-consistency auxiliary loss. | port adapted from the [official EulerFormer release](https://github.com/QingyaoAi/EulerFormer/tree/main/EulerFormer_models) | `python main.py --model eulerformer --dataset <name>` |
+| `eulerformer` | **EulerFormer**: Sequential User Behavior Modeling with Complex Vector Attention (Tian *et al.*, SIGIR 2024) — Euler-form learnable rotary embedding on a SASRec backbone with an angle-consistency auxiliary loss. | [paper](https://arxiv.org/abs/2403.17729) · port adapted from the [official release](https://github.com/Ethan-TZ/EulerFormer/tree/main/EulerFormer_models) | `python main.py --model eulerformer --dataset <name>` |
 
 ### RNN / generative
 
@@ -317,13 +317,11 @@ Then:
 2. Add a `elif args.model == "mymodel"` branch in `core/trainer.py::choose_model`. If the model is bidirectional / sequence-to-vector, set `args.parallel_ag = False`, `args.split_onebyone = True`. If the model has an auxiliary loss (KL, contrastive, …), extend the loss assembly block in `model_train` (search for `args.model == "svae"` for an example).
 3. Optionally add hyperparameters to `config.yaml` — they are auto-exposed as CLI flags.
 
-A minimal smoke test is provided:
+A quick way to sanity-check a new model is to launch a 1-epoch run on `ml-100k`:
 
 ```bash
-cd src && python _smoke_test_new_models.py
+python main.py --model mymodel --dataset ml-100k --epoch_num 1
 ```
-
-It instantiates each newly added model, runs a forward + backward on a fake left-padded batch, and verifies output shapes/dtypes match BBDRec's contract.
 
 ---
 
@@ -346,4 +344,4 @@ If our work helps your research, please cite:
 
 ## Acknowledgments
 
-This repo builds on great open-source work; we acknowledge each baseline's source above. The Transformer encoder skeleton draws inspiration from [RecBole](https://github.com/RUCAIBox/RecBole), the DreamRec baseline from [YangZhengyi98/DreamRec](https://github.com/YangZhengyi98/DreamRec), the SVAE baseline from [noveens/svae_cf](https://github.com/noveens/svae_cf), and the EulerFormer baseline from [QingyaoAi/EulerFormer](https://github.com/QingyaoAi/EulerFormer). We thank the authors for releasing their code.
+This repo builds on great open-source work; we acknowledge each baseline's source above. The Transformer encoder skeleton draws inspiration from [RecBole](https://github.com/RUCAIBox/RecBole), the DreamRec baseline from [YangZhengyi98/DreamRec](https://github.com/YangZhengyi98/DreamRec), the SVAE baseline from [noveens/svae_cf](https://github.com/noveens/svae_cf), and the EulerFormer baseline from [Ethan-TZ/EulerFormer](https://github.com/Ethan-TZ/EulerFormer). We thank the authors for releasing their code.
