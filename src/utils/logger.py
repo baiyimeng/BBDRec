@@ -83,7 +83,7 @@ def cmdline_args():
         "--diff_decoder", type=str, choices=["att", "mlp"], help="Decoder type"
     )
     parser.add_argument("--loss_scale", type=float, help="Loss scale")
-    parser.add_argument("--var_max", type=float, help="Max variance for diffusion")
+    parser.add_argument("--m", type=float, help="Brownian-bridge variance scale (paper m)")
 
     # Training strategy
     parser.add_argument("--split_onebyone", type=str2bool, help="Split one-by-one")

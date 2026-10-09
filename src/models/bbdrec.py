@@ -64,7 +64,7 @@ class BBDRec(nn.Module):
         self.hidden_size = args.hidden_size
         self.schedule_sampler_name = args.schedule_sampler_name
         self.diffusion_steps = args.diffusion_steps
-        self.var_max = args.var_max
+        self.m = args.m
         self.eps = 1e-4
 
         self.b_t = np.linspace(
@@ -75,7 +75,7 @@ class BBDRec(nn.Module):
         )
         self.b_t_minus_1 = np.append(0, self.b_t[:-1])
 
-        self.d_t = 2 * self.var_max * self.b_t * (1 - self.b_t)
+        self.d_t = self.m * self.b_t * (1 - self.b_t)
         self.d_t_minus_1 = np.append(0.0, self.d_t[:-1])
 
         self.g_t = (1 - self.b_t) / (1 - self.b_t_minus_1)

@@ -15,10 +15,10 @@ mkdir -p "$RESULT_DIR"
 exec > "${RESULT_DIR}/tune_bbdrec.log" 2>&1
 
 DS_LIST=(2 4 8 16 32)
-VM_LIST=(0.5 1 2 4 8)
+M_LIST=(1 2 4 8 16)
 LS_LIST=(0.01 0.1 1 10)
 
-TOTAL=$(( ${#DS_LIST[@]} * ${#VM_LIST[@]} * ${#LS_LIST[@]} ))
+TOTAL=$(( ${#DS_LIST[@]} * ${#M_LIST[@]} * ${#LS_LIST[@]} ))
 MAX_CONCURRENT=$(( NUM_GPUS * TASKS_PER_GPU ))
 
 echo "============================================"
@@ -35,14 +35,14 @@ for ((g=0; g<NUM_GPUS; g++)); do
 done
 
 for ds in "${DS_LIST[@]}"; do
-    for vm in "${VM_LIST[@]}"; do
+    for m in "${M_LIST[@]}"; do
         for ls in "${LS_LIST[@]}"; do
             g=$(( task_id % NUM_GPUS ))
             gpu="cuda:$((GPU_START + g))"
-            desc="ds${ds}_vm${vm}_ls${ls}"
+            desc="ds${ds}_m${m}_ls${ls}"
             log_path="${RESULT_DIR}/${MODEL}_${DATASET}_${desc}.log"
-            # Format: ds|vm|ls|gpu|desc|log_path|global_task_id
-            echo "${ds}|${vm}|${ls}|${gpu}|${desc}|${log_path}|${task_id}" \
+            # Format: ds|m|ls|gpu|desc|log_path|global_task_id
+            echo "${ds}|${m}|${ls}|${gpu}|${desc}|${log_path}|${task_id}" \
                 >> "${RESULT_DIR}/.gpu_${g}_tasks.txt"
             task_id=$((task_id + 1))
         done
@@ -62,7 +62,7 @@ for ((g=0; g<NUM_GPUS; g++)); do
         running=0
         gpu_completed=0
 
-        while IFS='|' read -r ds vm ls gpu2 desc log_path tid; do
+        while IFS='|' read -r ds m ls gpu2 desc log_path tid; do
 
             # ---- throttle: wait until this GPU has a free slot ----
             while [ $running -ge $TASKS_PER_GPU ]; do
@@ -71,7 +71,7 @@ for ((g=0; g<NUM_GPUS; g++)); do
                 gpu_completed=$((gpu_completed + 1))
             done
 
-            echo "[$(date '+%H:%M:%S')] START  [#${tid}]  ds=${ds}  vm=${vm}  ls=${ls}  ->  ${gpu}"
+            echo "[$(date '+%H:%M:%S')] START  [#${tid}]  ds=${ds}  m=${m}  ls=${ls}  ->  ${gpu}"
 
             # ---- launch one task on this GPU ----
             (
@@ -79,13 +79,13 @@ for ((g=0; g<NUM_GPUS; g++)); do
                     --dataset "${DATASET}" \
                     --model "${MODEL}" \
                     --diffusion_steps "${ds}" \
-                    --var_max "${vm}" \
+                    --m "${m}" \
                     --loss_scale "${ls}" \
                     --device "${gpu}" \
                     --description "${desc}" \
                     > "${log_path}" 2>&1
                 exit_code=$?
-                echo "[$(date '+%H:%M:%S')] DONE   [#${tid}]  ds=${ds}  vm=${vm}  ls=${ls}  (exit=${exit_code})"
+                echo "[$(date '+%H:%M:%S')] DONE   [#${tid}]  ds=${ds}  m=${m}  ls=${ls}  (exit=${exit_code})"
             ) &
 
             running=$((running + 1))
@@ -123,9 +123,9 @@ echo "============================================"
 > "${RESULT_DIR}/results.txt"
 
 for ds in "${DS_LIST[@]}"; do
-    for vm in "${VM_LIST[@]}"; do
+    for m in "${M_LIST[@]}"; do
         for ls in "${LS_LIST[@]}"; do
-            desc="ds${ds}_vm${vm}_ls${ls}"
+            desc="ds${ds}_m${m}_ls${ls}"
             log="${RESULT_DIR}/${MODEL}_${DATASET}_${desc}.log"
 
             test_line=$(grep "^Test:" "${log}" 2>/dev/null | tail -1)
@@ -135,11 +135,11 @@ for ds in "${DS_LIST[@]}"; do
                 ndcg20=$(echo "${test_line}" | grep -oP "'NDCG@20':\s*\K[0-9.]+")
                 [ -z "${hr20}" ] && hr20="N/A"
                 [ -z "${ndcg20}" ] && ndcg20="N/A"
-                printf "[OK]    ds=%-2s  vm=%-4s  ls=%-5s  |  HR@20=%-8s  NDCG@20=%-8s\n" \
-                       "${ds}" "${vm}" "${ls}" "${hr20}" "${ndcg20}"
-                echo "${hr20} ${ndcg20} ds=${ds} vm=${vm} ls=${ls}" >> "${RESULT_DIR}/results.txt"
+                printf "[OK]    ds=%-2s  m=%-4s  ls=%-5s  |  HR@20=%-8s  NDCG@20=%-8s\n" \
+                       "${ds}" "${m}" "${ls}" "${hr20}" "${ndcg20}"
+                echo "${hr20} ${ndcg20} ds=${ds} m=${m} ls=${ls}" >> "${RESULT_DIR}/results.txt"
             else
-                printf "[FAIL]  ds=%-2s  vm=%-4s  ls=%-5s\n" "${ds}" "${vm}" "${ls}"
+                printf "[FAIL]  ds=%-2s  m=%-4s  ls=%-5s\n" "${ds}" "${m}" "${ls}"
             fi
         done
     done

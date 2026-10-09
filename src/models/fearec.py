@@ -156,7 +156,7 @@ class _HybridAttention(nn.Module):
         head = values.shape[1]
         channel = values.shape[2]
         length = values.shape[3]
-        top_k = max(int(self.factor * math.log(length)), 1)
+        top_k = min(length, max(int(self.factor * math.log(length)), 1))
         mean_value = torch.mean(torch.mean(corr, dim=1), dim=1)
         index = torch.topk(torch.mean(mean_value, dim=0), top_k, dim=-1)[1]
         weights = torch.stack(
@@ -188,7 +188,7 @@ class _HybridAttention(nn.Module):
             .repeat(batch, head, channel, 1)
             .to(values.device)
         )
-        top_k = max(int(self.factor * math.log(length)), 1)
+        top_k = min(length, max(int(self.factor * math.log(length)), 1))
         mean_value = torch.mean(torch.mean(corr, dim=1), dim=1)
         weights, delay = torch.topk(mean_value, top_k, dim=-1)
         tmp_corr = torch.softmax(weights, dim=-1)

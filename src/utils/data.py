@@ -71,7 +71,9 @@ class ValDataset(data_utils.Dataset):
         hist = seq[-self.max_len :]
         padding_len = self.max_len - len(hist)
         hist_pad = [0] * padding_len + hist
-        answer_pad = [0] * padding_len + seq[-(len(hist) - 1) :] + self.u2answer[index]
+        # Slice the shifted targets together; seq[-0:] incorrectly returns all
+        # items when only one history position is retained.
+        answer_pad = [0] * padding_len + (seq[1:] + self.u2answer[index])[-len(hist) :]
         assert sum([i > 0 for i in hist_pad]) == sum([i > 0 for i in answer_pad])
         return torch.LongTensor(hist_pad), torch.LongTensor(answer_pad)
 
@@ -106,7 +108,7 @@ class TestDataset(data_utils.Dataset):
         hist = seq[-self.max_len :]
         padding_len = self.max_len - len(hist)
         hist_pad = [0] * padding_len + hist
-        answer_pad = [0] * padding_len + seq[-(len(hist) - 1) :] + self.u2answer[index]
+        answer_pad = [0] * padding_len + (seq[1:] + self.u2answer[index])[-len(hist) :]
         assert sum([i > 0 for i in hist_pad]) == sum([i > 0 for i in answer_pad])
         return torch.LongTensor(hist_pad), torch.LongTensor(answer_pad)
 

@@ -16,14 +16,14 @@ TASKS_PER_GPU=1
 GPU_START=0
 
 # Best hyperparameters per dataset (from tuning)
-# Format: dataset ds vm ls
+# Format: dataset ds m ls
 declare -A BEST_PARAMS
-BEST_PARAMS["baby"]="2 4 1"
-BEST_PARAMS["beauty"]="8 0.5 1"
-BEST_PARAMS["ml-100k"]="4 0.5 10"
-BEST_PARAMS["sports"]="2 0.5 0.01"
-BEST_PARAMS["toys"]="16 4 1"
-BEST_PARAMS["yelp"]="2 4 0.1"
+BEST_PARAMS["baby"]="2 8 1"
+BEST_PARAMS["beauty"]="8 1 1"
+BEST_PARAMS["ml-100k"]="4 1 10"
+BEST_PARAMS["sports"]="2 1 0.01"
+BEST_PARAMS["toys"]="16 8 1"
+BEST_PARAMS["yelp"]="2 8 0.1"
 
 DATASETS=("baby" "beauty" "ml-100k" "sports" "toys" "yelp")
 
@@ -61,7 +61,7 @@ for ((g=0; g<NUM_GPUS; g++)); do
 done
 
 for dataset in "${DATASETS[@]}"; do
-    read -r best_ds best_vm best_ls <<< "${BEST_PARAMS[$dataset]}"
+    read -r best_ds best_m best_ls <<< "${BEST_PARAMS[$dataset]}"
     for ablation in "${ABLATIONS[@]}"; do
         IFS='|' read -r abl_name abl_model abl_extra <<< "${ablation}"
         
@@ -70,8 +70,8 @@ for dataset in "${DATASETS[@]}"; do
         desc="${dataset}_${abl_name}"
         log_path="${RESULT_DIR}/${desc}.log"
         
-        # Format: dataset|ds|vm|ls|model|extra_args|desc|log_path|task_id|gpu
-        echo "${dataset}|${best_ds}|${best_vm}|${best_ls}|${abl_model}|${abl_extra}|${desc}|${log_path}|${task_id}|${gpu}" \
+        # Format: dataset|ds|m|ls|model|extra_args|desc|log_path|task_id|gpu
+        echo "${dataset}|${best_ds}|${best_m}|${best_ls}|${abl_model}|${abl_extra}|${desc}|${log_path}|${task_id}|${gpu}" \
             >> "${RESULT_DIR}/.gpu_${g}_tasks.txt"
         
         task_id=$((task_id + 1))
@@ -90,7 +90,7 @@ for ((g=0; g<NUM_GPUS; g++)); do
         running=0
         gpu_completed=0
 
-        while IFS='|' read -r dataset ds vm ls model extra_args desc log_path tid gpu2; do
+        while IFS='|' read -r dataset ds m ls model extra_args desc log_path tid gpu2; do
 
             # throttle: wait until this GPU has a free slot
             while [ $running -ge $TASKS_PER_GPU ]; do
@@ -106,7 +106,7 @@ for ((g=0; g<NUM_GPUS; g++)); do
                     --dataset "${dataset}" \
                     --model "${model}" \
                     --diffusion_steps "${ds}" \
-                    --var_max "${vm}" \
+                    --m "${m}" \
                     --loss_scale "${ls}" \
                     --device "${gpu}" \
                     --description "${desc}" \
@@ -149,11 +149,11 @@ echo "  Ablation Results Summary"
 echo "============================================"
 
 for dataset in "${DATASETS[@]}"; do
-    read -r best_ds best_vm best_ls <<< "${BEST_PARAMS[$dataset]}"
+    read -r best_ds best_m best_ls <<< "${BEST_PARAMS[$dataset]}"
     
     echo ""
     echo "----------------------------------------"
-    echo "  Dataset: ${dataset}  (Best: ds=${best_ds}, vm=${best_vm}, ls=${best_ls})"
+    echo "  Dataset: ${dataset}  (Best: ds=${best_ds}, m=${best_m}, ls=${best_ls})"
     echo "----------------------------------------"
     printf "  %-18s  %-10s  %-10s  %-10s\n" "Variant" "HR@20" "NDCG@20" "ΔHR%"
     echo "  ------------------------------------------------------"

@@ -119,9 +119,14 @@ class _EulerMultiHeadAttention(nn.Module):
             sin_b = torch.sin(b)
             denom = cos_a @ cos_b.transpose(-2, -1) + sin_a @ sin_b.transpose(-2, -1)
             denom = denom / self.tep
-            numerator = torch.diagonal(torch.exp(denom), dim1=-1, dim2=-2)
-            denominator = torch.sum(torch.exp(denom), dim=-1) + 1e-5
-            return torch.mean(-torch.log(numerator / denominator)) * self.lamb
+            # Evaluate the same exp-normalized objective in log space to avoid
+            # inf/inf (or log(0)) for large hidden sizes / learned angle weights.
+            log_numerator = torch.diagonal(denom, dim1=-1, dim2=-2)
+            log_denominator = torch.logaddexp(
+                torch.logsumexp(denom, dim=-1),
+                denom.new_tensor(math.log(1e-5)),
+            )
+            return torch.mean(log_denominator - log_numerator) * self.lamb
 
         return _cal(pq, self.aux_dropout(pq)) + _cal(pk, self.aux_dropout(pk))
 

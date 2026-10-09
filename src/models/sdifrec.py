@@ -44,6 +44,8 @@ class Denoiser(nn.Module):
         time_emb = self.lambda_uncertainty * self.time_embed(
             get_timestep_embedding(t, self.hidden_size)
         )
+        # A shared timestep has shape [B, 1, H]; concatenate it at every position.
+        time_emb = time_emb.expand_as(x_t)
         alpha = self.sigma * torch.randn_like(x_t) + self.mu
         x_t = alpha * x_t
 
@@ -215,7 +217,7 @@ class SdifRec(nn.Module):
             ).reshape(*tgt.shape)
         else:
             t, weights = self.schedule_sampler.sample(tgt.shape[0], tgt.device)
-            x_t = self.q_sample(tgt, t, mask=mask)
+            x_t = self.q_sample(tgt, t, item_rep=item_rep, mask=mask)
         return x_t, t
 
     def forward(self, item_rep, item_tag, mask_seq, mask_tag):

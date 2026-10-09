@@ -62,14 +62,14 @@ ITEM_NUM = {
     "beauty": 6086,
 }
 
-# Optimal BBDRec hyperparams per dataset (from hyperparameter sweep)
+# Visualization-specific BBDRec settings, retaining the existing low-noise scale.
 BEST_BBD_CONFIG = {
-    "baby": {"diffusion_steps": 2, "var_max": 1e-4, "loss_scale": 1.0},
-    "beauty": {"diffusion_steps": 8, "var_max": 1e-4, "loss_scale": 1.0},
-    "ml-100k": {"diffusion_steps": 4, "var_max": 1e-4, "loss_scale": 10.0},
-    "sports": {"diffusion_steps": 2, "var_max": 1e-4, "loss_scale": 0.01},
-    "toys": {"diffusion_steps": 16, "var_max": 1e-4, "loss_scale": 1.0},
-    "yelp": {"diffusion_steps": 2, "var_max": 1e-4, "loss_scale": 0.1},
+    "baby": {"diffusion_steps": 2, "m": 2e-4, "loss_scale": 1.0},
+    "beauty": {"diffusion_steps": 8, "m": 2e-4, "loss_scale": 1.0},
+    "ml-100k": {"diffusion_steps": 4, "m": 2e-4, "loss_scale": 10.0},
+    "sports": {"diffusion_steps": 2, "m": 2e-4, "loss_scale": 0.01},
+    "toys": {"diffusion_steps": 16, "m": 2e-4, "loss_scale": 1.0},
+    "yelp": {"diffusion_steps": 2, "m": 2e-4, "loss_scale": 0.1},
 }
 
 
@@ -89,7 +89,7 @@ def build_args(dataset: str, model_name: str) -> argparse.Namespace:
     if model_name == "bbdrec":
         config["pretrained"] = True
         config["freeze_emb"] = True
-        # Apply optimal per-dataset hyperparams
+        # Apply visualization-specific per-dataset settings
         best = BEST_BBD_CONFIG.get(dataset, {})
         for k, v in best.items():
             config[k] = v

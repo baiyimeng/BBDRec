@@ -141,8 +141,9 @@ def model_train(
     best_metrics_dict = {}
     best_epoch = {}
     for k in args.metric_ks:
-        best_metrics_dict[f"Best_HR@{k}"] = 0
-        best_metrics_dict[f"Best_NDCG@{k}"] = 0
+        # Zero is a valid first validation result and must still select a model.
+        best_metrics_dict[f"Best_HR@{k}"] = float("-inf")
+        best_metrics_dict[f"Best_NDCG@{k}"] = float("-inf")
         best_epoch[f"Best_epoch_HR@{k}"] = 0
         best_epoch[f"Best_epoch_NDCG@{k}"] = 0
     bad_count = 0
@@ -206,7 +207,9 @@ def model_train(
             f"[Train] Epoch {epoch_temp:3d} | CE Loss: {avg_ce_loss:.4f} | Diff Loss: {avg_diff_loss:.4f}"
         )
         lr_scheduler.step()
-        if epoch_temp != 0 and epoch_temp % args.eval_interval == 0:
+        if (epoch_temp != 0 and epoch_temp % args.eval_interval == 0) or (
+            epoch_temp == epochs - 1 and best_model is None
+        ):
             metrics_dict = {}
             for k in args.metric_ks:
                 metrics_dict[f"HR@{k}"] = []
