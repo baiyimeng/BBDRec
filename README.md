@@ -45,16 +45,16 @@ The repository includes six preprocessed datasets, Stage-1 pretrained item embed
 
 ## Results
 
-The current manuscript evaluates recommendations under the **full-ranking protocol**. The table below reports BBDRec's HR@20 and NDCG@20 as mean ± sample standard deviation across five runs, in percent. Results at K = 5 and 10 are provided in the manuscript appendix.
+The current manuscript evaluates recommendations under the **full-ranking protocol**. The table below reports BBDRec's HR@20 and NDCG@20 as averages across five runs, in percent. Results at K = 5 and 10 are provided in the manuscript appendix.
 
 | Dataset | HR@20 (%) | NDCG@20 (%) |
 |---|---:|---:|
-| Baby | 7.4841 ± 0.3081 | 3.2566 ± 0.1311 |
-| Beauty | 17.1476 ± 0.3644 | 8.2508 ± 0.2134 |
-| ML-100K | 22.9676 ± 0.8140 | 8.4818 ± 0.3771 |
-| Sports | 7.9144 ± 0.1846 | 3.3872 ± 0.0757 |
-| Toys | 12.1264 ± 0.4254 | 5.8464 ± 0.1348 |
-| Yelp | 7.5349 ± 0.0244 | 3.0242 ± 0.0172 |
+| Baby | 7.4841 | 3.2566 |
+| Beauty | 17.1476 | 8.2508 |
+| ML-100K | 22.9676 | 8.4818 |
+| Sports | 7.9144 | 3.3872 |
+| Toys | 12.1264 | 5.8464 |
+| Yelp | 7.5349 | 3.0242 |
 
 BBDRec generally outperforms the compared sequential and diffusion-based baselines: it achieves the highest HR@20 on all six datasets and the highest NDCG@20 on five. NDCG@20 on Toys is the exception.
 
